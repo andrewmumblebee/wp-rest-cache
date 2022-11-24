@@ -382,12 +382,6 @@ class Endpoint_Api {
 			return;
 		}
 
-		$headers = apply_filters( 'wp_rest_cache/add_cache_headers', new stdClass() );
-
-		foreach ( $headers as $key => $value ) {
-			$header = sprintf( '%s: %s', $key, $value );
-			header( $header );
-		}
 
 		// add headers i.e. cache timer.
 
@@ -432,6 +426,8 @@ class Endpoint_Api {
 				echo $data; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				exit;
 			}
+		} else {
+			header( 'X-WP-Cached-Call: Stale' );
 		}
 
 		// Catch the headers after serving.

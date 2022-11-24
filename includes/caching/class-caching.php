@@ -1255,7 +1255,7 @@ class Caching {
 	 * @return void
 	 */
 	private function schedule_cleanup() {
-		$use_cron_cleanup = (boolean) apply_filters( 'wp_rest_cache/use_cron_cleanup', true );
+		$use_cron_cleanup = apply_filters( 'wp_rest_cache/use_cron_cleanup', true );
 
 		if ($use_cron_cleanup) {
 			if ( ! wp_next_scheduled( 'wp_rest_cache_cleanup_deleted_caches' ) ) {
