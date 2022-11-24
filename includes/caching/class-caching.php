@@ -1255,8 +1255,14 @@ class Caching {
 	 * @return void
 	 */
 	private function schedule_cleanup() {
-		if ( ! wp_next_scheduled( 'wp_rest_cache_cleanup_deleted_caches' ) ) {
-			wp_schedule_single_event( time() + 5 * MINUTE_IN_SECONDS, 'wp_rest_cache_cleanup_deleted_caches' );
+		$use_cron_cleanup = (boolean) apply_filters( 'wp_rest_cache/use_cron_cleanup', true );
+
+		if ($use_cron_cleanup) {
+			if ( ! wp_next_scheduled( 'wp_rest_cache_cleanup_deleted_caches' ) ) {
+				wp_schedule_single_event( time() + 5 * MINUTE_IN_SECONDS, 'wp_rest_cache_cleanup_deleted_caches' );
+			}
+		} else {
+			$this->cleanup_deleted_caches();
 		}
 	}
 
@@ -1279,13 +1285,16 @@ class Caching {
 		 */
 		$limit = (int) apply_filters( 'wp_rest_cache/max_cleanup_caches', 1000 );
 
-		$sql = "SELECT  `cache_key`, `deleted`
+		$sql = "SELECT `request_uri`, `request_headers`, `cache_key`, `deleted`
                 FROM    {$this->db_table_caches}
                 WHERE   `expiration` = %s
                 AND     `cleaned` = %d
                 LIMIT   %d";
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$caches = $wpdb->get_results( $wpdb->prepare( $sql, date_i18n( 'Y-m-d H:i:s', 1 ), 0, $limit ) );
+
+		do_action( 'wp_rest_cache/deleted_caches', $caches );
+
 		if ( $caches ) {
 			foreach ( $caches as $cache ) {
 				$this->delete_cache( $cache->cache_key, $cache->deleted );

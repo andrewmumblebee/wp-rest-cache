@@ -382,6 +382,15 @@ class Endpoint_Api {
 			return;
 		}
 
+		$headers = apply_filters( 'wp_rest_cache/add_cache_headers', new stdClass() );
+
+		foreach ( $headers as $key => $value ) {
+			$header = sprintf( '%s: %s', $key, $value );
+			header( $header );
+		}
+
+		// add headers i.e. cache timer.
+
 		$cache = \WP_Rest_Cache_Plugin\Includes\Caching\Caching::get_instance()->get_cache( $this->cache_key );
 
 		if ( false !== $cache ) {
