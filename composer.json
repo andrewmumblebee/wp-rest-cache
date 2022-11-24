@@ -1,5 +1,5 @@
 {
-  "name": "andrewmumblebee/redirection",
+  "name": "andrewmumblebee/wp-rest-cache",
   "type": "wordpress-plugin",
-  "version": "2022.2.2.1"
+  "version": "2022.2.2"
 }
